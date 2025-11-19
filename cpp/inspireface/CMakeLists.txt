@@ -50,11 +50,11 @@ if(ISF_ENABLE_OPENCV)
 endif()
 
 # SQLite3
-# set(SOURCE_FILES ${SOURCE_FILES} 
-#         ${ISF_THIRD_PARTY_DIR}/inspireface-precompile-lite/sqlite/sqlite3.c
-#         ${ISF_THIRD_PARTY_DIR}/inspireface-precompile-lite/sqlite/sqlite-vec.c
-# )   # Add SQLite3 C_API file
-# set(SQLITE_INCLUDE ${ISF_THIRD_PARTY_DIR}/inspireface-precompile-lite/sqlite/)
+set(SOURCE_FILES ${SOURCE_FILES} 
+        ${ISF_THIRD_PARTY_DIR}/inspireface-precompile-lite/sqlite/sqlite3.c
+        ${ISF_THIRD_PARTY_DIR}/inspireface-precompile-lite/sqlite/sqlite-vec.c
+)   # Add SQLite3 C_API file
+set(SQLITE_INCLUDE ${ISF_THIRD_PARTY_DIR}/inspireface-precompile-lite/sqlite/)
 
 
 

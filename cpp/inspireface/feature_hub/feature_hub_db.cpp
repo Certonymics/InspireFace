@@ -10,7 +10,7 @@
 #include "middleware/utils.h"
 #include "middleware/system.h"
 #include "log.h"
-// #include "feature_hub/embedding_db/embedding_db.h"
+#include "feature_hub/embedding_db/embedding_db.h"
 
 #define DB_FILE_NAME ".feature_hub_db_v0"
 
@@ -60,9 +60,9 @@ int32_t FeatureHubDB::DisableHub() {
         return HSUCCEED;
     }
 
-    // if (EMBEDDING_DB::GetInstance().IsInitialized()) {
-    //     EMBEDDING_DB::Deinit();
-    // }
+    if (EMBEDDING_DB::GetInstance().IsInitialized()) {
+        EMBEDDING_DB::Deinit();
+    }
 
     pImpl->m_search_face_feature_cache_.clear();
 
@@ -81,7 +81,7 @@ int32_t FeatureHubDB::GetAllIds() {
         INSPIRE_LOGE("FeatureHub is disabled, please enable it before it can be served");
         return HERR_FT_HUB_DISABLE;
     }
-    // pImpl->m_all_ids_ = EMBEDDING_DB::GetInstance().GetAllIds();
+    pImpl->m_all_ids_ = EMBEDDING_DB::GetInstance().GetAllIds();
     return HSUCCEED;
 }
 
@@ -107,7 +107,7 @@ int32_t FeatureHubDB::EnableHub(const DatabaseConfiguration &configuration) {
         }
     }
 
-    // EMBEDDING_DB::Init(dbFile, 512, IdMode(configuration.primary_key_mode));
+    EMBEDDING_DB::Init(dbFile, 512, IdMode(configuration.primary_key_mode));
     pImpl->m_enable_ = true;
     pImpl->m_face_feature_ptr_cache_ = std::make_shared<FaceFeatureEntity>();
 
@@ -186,8 +186,7 @@ int32_t FeatureHubDB::GetFaceFeatureCount() {
         return 0;
     }
 
-    // return EMBEDDING_DB::GetInstance().GetVectorCount();
-    return 0;
+    return EMBEDDING_DB::GetInstance().GetVectorCount();
 }
 
 int32_t FeatureHubDB::SearchFaceFeature(const Embedded &queryFeature, FaceSearchResult &searchResult, bool returnFeature) {
@@ -198,8 +197,7 @@ int32_t FeatureHubDB::SearchFaceFeature(const Embedded &queryFeature, FaceSearch
     }
 
     pImpl->m_search_face_feature_cache_.clear();
-    // auto results = EMBEDDING_DB::GetInstance().SearchSimilarVectors(queryFeature, 1, pImpl->m_recognition_threshold_, returnFeature);
-    auto results = std::vector<FaceSearchResult>();
+    auto results = EMBEDDING_DB::GetInstance().SearchSimilarVectors(queryFeature, 1, pImpl->m_recognition_threshold_, returnFeature);
     searchResult.id = -1;
 
     if (!results.empty()) {
@@ -226,8 +224,7 @@ int32_t FeatureHubDB::SearchFaceFeatureTopKCache(const Embedded &queryFeature, s
 
     pImpl->m_top_k_confidence_.clear();
     pImpl->m_top_k_custom_ids_cache_.clear();
-    // auto results = EMBEDDING_DB::GetInstance().SearchSimilarVectors(queryFeature, topK, pImpl->m_recognition_threshold_, false);
-    auto results = std::vector<FaceSearchResult>();
+    auto results = EMBEDDING_DB::GetInstance().SearchSimilarVectors(queryFeature, topK, pImpl->m_recognition_threshold_, false);
 
     for (size_t i = 0; i < results.size(); i++) {
         pImpl->m_top_k_custom_ids_cache_.push_back(results[i].id);
@@ -245,8 +242,7 @@ int32_t FeatureHubDB::SearchFaceFeatureTopK(const Embedded &queryFeature, std::v
         return HERR_FT_HUB_DISABLE;
     }
 
-    // searchResult = EMBEDDING_DB::GetInstance().SearchSimilarVectors(queryFeature, topK, pImpl->m_recognition_threshold_, returnFeature);
-    searchResult = std::vector<FaceSearchResult>();
+    searchResult = EMBEDDING_DB::GetInstance().SearchSimilarVectors(queryFeature, topK, pImpl->m_recognition_threshold_, returnFeature);
     return HSUCCEED;
 }
 
@@ -257,8 +253,7 @@ int32_t FeatureHubDB::FaceFeatureInsert(const std::vector<float> &feature, int32
         return HERR_FT_HUB_DISABLE;
     }
 
-    // bool ret = EMBEDDING_DB::GetInstance().InsertVector(id, feature, result_id);
-    bool ret = false;
+    bool ret = EMBEDDING_DB::GetInstance().InsertVector(id, feature, result_id);
     if (!ret) {
         result_id = -1;
         return HERR_FT_HUB_INSERT_FAILURE;
@@ -274,7 +269,7 @@ int32_t FeatureHubDB::FaceFeatureRemove(int32_t id) {
         return HERR_FT_HUB_DISABLE;
     }
 
-    // EMBEDDING_DB::GetInstance().DeleteVector(id);
+    EMBEDDING_DB::GetInstance().DeleteVector(id);
     return HSUCCEED;
 }
 
@@ -285,7 +280,7 @@ int32_t FeatureHubDB::FaceFeatureUpdate(const std::vector<float> &feature, int32
         return HERR_FT_HUB_DISABLE;
     }
 
-    // EMBEDDING_DB::GetInstance().UpdateVector(customId, feature);
+    EMBEDDING_DB::GetInstance().UpdateVector(customId, feature);
     return HSUCCEED;
 }
 
@@ -296,8 +291,7 @@ int32_t FeatureHubDB::GetFaceFeature(int32_t id) {
         return HERR_FT_HUB_DISABLE;
     }
 
-    // auto vec = EMBEDDING_DB::GetInstance().GetVector(id);
-    auto vec = std::vector<float>();
+    auto vec = EMBEDDING_DB::GetInstance().GetVector(id);
     if (vec.empty()) {
         return HERR_FT_HUB_NOT_FOUND_FEATURE;
     }
@@ -316,8 +310,7 @@ int32_t FeatureHubDB::GetFaceFeature(int32_t id, std::vector<float> &feature) {
         return HERR_FT_HUB_DISABLE;
     }
 
-    // feature = EMBEDDING_DB::GetInstance().GetVector(id);
-    feature = std::vector<float>();
+    feature = EMBEDDING_DB::GetInstance().GetVector(id);
     if (feature.empty()) {
         return HERR_FT_HUB_NOT_FOUND_FEATURE;
     }
@@ -332,7 +325,10 @@ int32_t FeatureHubDB::GetFaceFeature(int32_t id, FaceEmbedding& feature) {
         return HERR_FT_HUB_DISABLE;
     }
 
-    // feature.embedding = EMBEDDING_DB::GetInstance().GetVector(id);
+    feature.embedding = EMBEDDING_DB::GetInstance().GetVector(id);
+    if (feature.embedding.empty()) {
+        return HERR_FT_HUB_NOT_FOUND_FEATURE;
+    }
 
     return HSUCCEED;
 }
@@ -342,7 +338,7 @@ int32_t FeatureHubDB::ViewDBTable() {
         INSPIRE_LOGE("FeatureHub is disabled, please enable it before it can be served");
         return HERR_FT_HUB_DISABLE;
     }
-    // EMBEDDING_DB::GetInstance().ShowTable();
+    EMBEDDING_DB::GetInstance().ShowTable();
     return HSUCCEED;
 }
 
