@@ -53,6 +53,12 @@ endif()
 # For iOS/Android, SQLite3 will be linked by the app, so we only need headers for compilation
 set(SQLITE_INCLUDE ${ISF_THIRD_PARTY_DIR}/inspireface-precompile-lite/sqlite/)
 
+if (ANDROID)
+    set(SOURCE_FILES ${SOURCE_FILES} 
+        ${ISF_THIRD_PARTY_DIR}/inspireface-precompile-lite/sqlite/sqlite3.c
+        ${ISF_THIRD_PARTY_DIR}/inspireface-precompile-lite/sqlite/sqlite-vec.c
+    )
+endif()
 
 
 if (ISF_ENABLE_RKNN)
