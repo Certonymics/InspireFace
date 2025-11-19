@@ -28,3 +28,5 @@ cpp/inspireface/version.txt
 .rknpu2_cache/
 test_res/data/video_frames/
 *.mp4
+# Snyk Security Extension - AI Rules (auto-generated)
+.cursor/rules/snyk_rules.mdc
