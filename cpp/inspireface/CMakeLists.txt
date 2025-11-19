@@ -49,11 +49,8 @@ if(ISF_ENABLE_OPENCV)
     set(LINK_THIRD_LIBS ${LINK_THIRD_LIBS} ${OpenCV_LIBS})
 endif()
 
-# SQLite3
-set(SOURCE_FILES ${SOURCE_FILES} 
-        ${ISF_THIRD_PARTY_DIR}/inspireface-precompile-lite/sqlite/sqlite3.c
-        ${ISF_THIRD_PARTY_DIR}/inspireface-precompile-lite/sqlite/sqlite-vec.c
-)   # Add SQLite3 C_API file
+# SQLite3 - use external system SQLite3
+# For iOS/Android, SQLite3 will be linked by the app, so we only need headers for compilation
 set(SQLITE_INCLUDE ${ISF_THIRD_PARTY_DIR}/inspireface-precompile-lite/sqlite/)
 
 
@@ -120,7 +117,7 @@ endif ()
 # Add include directory
 set(NEED_INCLUDE ${NEED_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/include/inspireface)
 
-if (ISF_BUILD_LINUX_ARM7 OR ANDROID)
+if (ISF_BUILD_LINUX_ARM7 OR (ANDROID AND ANDROID_ABI STREQUAL "armeabi-v7a"))
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpu=neon")
 endif()
 
@@ -172,6 +169,9 @@ elseif(IOS)
         "-framework CoreMedia"
         ${MNN_FRAMEWORK_PATH}
     )
+    # Note: SQLite3 and sqlite-vec are provided by the app
+    # sqlite3.h should be available in the iOS SDK
+    # sqlite-vec.h is provided via SQLITE_INCLUDE
     if(ISF_ENABLE_APPLE_EXTENSION)
         set(LINK_THIRD_LIBS ${LINK_THIRD_LIBS} ${ACCELERATE_LIBRARY})
     endif()
